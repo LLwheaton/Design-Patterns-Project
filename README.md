@@ -9,13 +9,28 @@ You must include a readme file (a simple text file, either .txt or .md) listing 
 
 #### 3. Streamlining client contact methods
 
-
 #### 4. Lag when loading clients
-Class(es) affected: ClientImpl class only.
-
+**Class(es) affected:** <br>
+ClientImpl class only.
 
 #### 5. Simpler process for comparing Report objects
+**Class(es) affected:** <br>
+ReportImpl <br>
+CriticalAuditOrder
+- setReport()
+- getReportEmployeeCount() <br>
 
+FirstOrderType <br>
+- setReport() 
+- getReportEmployeeCount()<br>
+ 
+NewOrderImpl 
+- setReport()
+- getReportEmployeeCount() <br>
+
+Order66
+- setReport()
+- getReportEmployeeCount()
 
 ####  6. Slow database operations for Order creation
 

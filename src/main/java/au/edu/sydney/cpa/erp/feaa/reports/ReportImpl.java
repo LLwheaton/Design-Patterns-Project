@@ -11,15 +11,10 @@ public class ReportImpl implements Report {
     //Value Object requires it's values to be immutable
     private final String name;
     private final double commissionPerEmployee;
-    //private double[] legalData;
     private final ImmutableDoubleArray legalData;
-    //private double[] cashFlowData;
     private final ImmutableDoubleArray cashFlowData;
-    //private double[] mergesData;
     private final ImmutableDoubleArray mergesData;
-    //private double[] tallyingData;
     private final ImmutableDoubleArray tallyingData;
-    //private double[] deductionsData;
     private final ImmutableDoubleArray deductionsData;
 
     public ReportImpl(String name,
@@ -31,6 +26,7 @@ public class ReportImpl implements Report {
                       double[] deductionsData) {
         this.name = name;
         this.commissionPerEmployee = commissionPerEmployee;
+        //All final values initialised to null (if value passed in is null) or an immutable double array
         this.legalData = (legalData == null) ? null : ImmutableDoubleArray.copyOf(legalData);
         this.cashFlowData = (cashFlowData == null) ? null : ImmutableDoubleArray.copyOf(cashFlowData);
         this.mergesData = (mergesData == null) ? null : ImmutableDoubleArray.copyOf(mergesData);
@@ -47,6 +43,10 @@ public class ReportImpl implements Report {
     public double getCommission() {
         return commissionPerEmployee;
     }
+
+    /*
+    * All getters below now return null or a double[] array type
+    * * */
 
     @Override
     public double[] getLegalData() {
