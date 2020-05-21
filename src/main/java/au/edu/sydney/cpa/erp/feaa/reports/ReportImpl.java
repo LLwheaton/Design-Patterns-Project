@@ -2,10 +2,14 @@ package au.edu.sydney.cpa.erp.feaa.reports;
 
 import au.edu.sydney.cpa.erp.ordering.Report;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 public class ReportImpl implements Report {
 
-    private String name;
-    private double commissionPerEmployee;
+    //Value Object requires it's values to be immutable
+    private final String name;
+    private final double commissionPerEmployee;
     private double[] legalData;
     private double[] cashFlowData;
     private double[] mergesData;
@@ -67,5 +71,28 @@ public class ReportImpl implements Report {
     public String toString() {
 
         return String.format("%s", name);
+    }
+
+    //Makes sure it is of ReportImpl type and calls equals method
+    public boolean equals(Object other){
+        return (other instanceof ReportImpl) && equals((ReportImpl)other);
+    }
+
+    //checking for equality between all variables
+    public boolean equals(ReportImpl other){
+        if (this.getCommission() == other.getCommission() &&
+                this.name.equals(other.getReportName()) &&
+                Arrays.equals(this.legalData, other.getLegalData()) &&
+                Arrays.equals(this.cashFlowData, other.getCashFlowData()) &&
+                Arrays.equals(this.mergesData, other.getMergesData()) &&
+                Arrays.equals(this.tallyingData, other.getTallyingData()) &&
+                Arrays.equals(this.deductionsData, other.getDeductionsData())) {
+            return true;
+        }
+        return false;
+    }
+    //hash code is combined objects
+    public int hashCode(){
+        return Objects.hash(name, commissionPerEmployee, legalData, cashFlowData, mergesData, tallyingData, deductionsData);
     }
 }
