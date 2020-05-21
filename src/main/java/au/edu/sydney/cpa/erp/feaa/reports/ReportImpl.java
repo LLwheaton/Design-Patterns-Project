@@ -75,7 +75,10 @@ public class ReportImpl implements Report {
 
     //Makes sure it is of ReportImpl type and calls equals method
     public boolean equals(Object other){
-        return (other instanceof ReportImpl) && equals((ReportImpl)other);
+        if(!(other instanceof ReportImpl)){
+            return false;
+        }
+        return equals((ReportImpl)other);
     }
 
     //checking for equality between all variables
