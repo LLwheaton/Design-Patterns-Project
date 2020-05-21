@@ -124,7 +124,7 @@ public class FEAAFacade {
 
         //Added, will need to remove before final submission*****************************
         long t = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-        System.out.println("FEAAFacade.getAllReports: " + t/1024/1024); //MB
+        System.out.println("FEAAFacade.getAllReports ram used: " + t/1024/1024); //MB
 
         return new ArrayList<>(ReportDatabase.getTestReports());
     }
