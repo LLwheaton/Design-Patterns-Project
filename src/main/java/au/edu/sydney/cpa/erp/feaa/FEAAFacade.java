@@ -136,26 +136,27 @@ public class FEAAFacade {
 
         List<ContactMethod> contactPriorityAsMethods = new ArrayList<>();
 
+        //Based on user input, create a new Handler and add it to the list (this is a replacement for enums)
         if (null != contactPriority) {
             for (String method: contactPriority) {
                 switch (method.toLowerCase()) {
                     case "internal accounting":
-                        contactPriorityAsMethods.add(ContactMethod.INTERNAL_ACCOUNTING);
+                        contactPriorityAsMethods.add(new InternalAccountingHandler());
                         break;
                     case "email":
-                        contactPriorityAsMethods.add(ContactMethod.EMAIL);
+                        contactPriorityAsMethods.add(new EmailHandler());
                         break;
                     case "carrier pigeon":
-                        contactPriorityAsMethods.add(ContactMethod.CARRIER_PIGEON);
+                        contactPriorityAsMethods.add(new CarrierPidgeonHandler());
                         break;
                     case "mail":
-                        contactPriorityAsMethods.add(ContactMethod.MAIL);
+                        contactPriorityAsMethods.add(new MailHandler());
                         break;
                     case "phone call":
-                        contactPriorityAsMethods.add(ContactMethod.PHONECALL);
+                        contactPriorityAsMethods.add(new PhoneCallHandler());
                         break;
                     case "sms":
-                        contactPriorityAsMethods.add(ContactMethod.SMS);
+                        contactPriorityAsMethods.add(new SMSHandler());
                         break;
                     default:
                         break;
@@ -163,13 +164,20 @@ public class FEAAFacade {
             }
         }
 
+        //Default list also includes new Handlers instead of enums
         if (contactPriorityAsMethods.size() == 0) { // needs setting to default
             contactPriorityAsMethods = Arrays.asList(
-                    ContactMethod.INTERNAL_ACCOUNTING,
-                    ContactMethod.EMAIL,
-                    ContactMethod.CARRIER_PIGEON,
-                    ContactMethod.MAIL,
-                    ContactMethod.PHONECALL
+//                    ContactMethod.INTERNAL_ACCOUNTING,
+//                    ContactMethod.EMAIL,
+//                    ContactMethod.CARRIER_PIGEON,
+//                    ContactMethod.MAIL,
+//                    ContactMethod.PHONECALL
+                    new InternalAccountingHandler(),
+                    new EmailHandler(),
+                    new CarrierPidgeonHandler(),
+                    new MailHandler(),
+                    new PhoneCallHandler()
+
             );
         }
 

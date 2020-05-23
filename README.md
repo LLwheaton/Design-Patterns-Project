@@ -8,6 +8,17 @@ You must include a readme file (a simple text file, either .txt or .md) listing 
 #### 2. Reducing class load of Orders
 
 #### 3. Streamlining client contact methods
+**Class(es) affected:** <br>
+- ContactHandler
+- ContactMethod
+- FEAAFacade
+  - finaliseOrder()
+- CarrierPidgeonHanlder (new)
+- EmailHandler (new)
+- InternalAccountingHandler (new)
+- MailHandler (new)
+- PhoneCallHandler (new)
+- SMSHandler (new)
 
 #### 4. Lag when loading clients
 **Class(es) affected:** <br>
@@ -15,22 +26,22 @@ ClientImpl class only.
 
 #### 5. Simpler process for comparing Report objects
 **Class(es) affected:** <br>
-ReportImpl <br>
-CriticalAuditOrder
-- setReport()
-- getReportEmployeeCount() <br>
+- ReportImpl
+- CriticalAuditOrder
+  - setReport()
+  - getReportEmployeeCount() <br>
 
-FirstOrderType <br>
-- setReport() 
-- getReportEmployeeCount()<br>
+- FirstOrderType <br>
+  - setReport() 
+  - getReportEmployeeCount()<br>
  
-NewOrderImpl 
-- setReport()
-- getReportEmployeeCount() <br>
+- NewOrderImpl 
+  - setReport()
+  - getReportEmployeeCount() <br>
 
-Order66
-- setReport()
-- getReportEmployeeCount()
+- Order66
+  - setReport()
+  - getReportEmployeeCount()
 
 ####  6. Slow database operations for Order creation
 
