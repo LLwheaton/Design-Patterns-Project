@@ -57,34 +57,23 @@ public class FEAAFacade {
 
         int id = TestDatabase.getInstance().getNextOrderID();
 
-        if (isScheduled) {
-            if (1 == orderType) { // 1 is regular accounting
-                if (isCritical) {
-                    order = new FirstOrderTypeScheduled(id, clientID, date, criticalLoading, maxCountedEmployees, numQuarters);
-                } else {
-                    order = new Order66Scheduled(id, clientID, date, maxCountedEmployees, numQuarters);
-                }
-            } else if (2 == orderType) { // 2 is audit
-                    if (isCritical) {
-                        order = new CriticalAuditOrderScheduled(id, clientID, date, criticalLoading, numQuarters);
-                    } else {
-                        order = new NewOrderImplScheduled(id, clientID, date, numQuarters);
-                    }
-            } else {return null;}
+        OrderPriority priority;
+        OrderType type;
+        if(isCritical){
+            priority = new CriticalPriority(criticalLoading);
         } else {
-            if (1 == orderType) {
-                if (isCritical) {
-                    order = new FirstOrderType(id, clientID, date, criticalLoading, maxCountedEmployees);
-                } else {
-                    order = new Order66(id, clientID, date, maxCountedEmployees);
-                }
-            } else if (2 == orderType) {
-                if (isCritical) {
-                    order = new CriticalAuditOrder(id, clientID, date, criticalLoading);
-                } else {
-                    order = new NewOrderImpl(id, clientID, date);
-                }
-            } else {return null;}
+            priority = new NormalPriority();
+        }
+        if(1 == orderType){
+            type = new RegularAccounting(maxCountedEmployees);
+        } else if (2 == orderType) {
+            type = new Audit();
+        } else { return null; }
+
+        if (isScheduled) {
+            order = new OrderScheduled(priority, type, id, clientID, date, numQuarters);
+        } else {
+            order = new OrderNonScheduled(priority, type, id, clientID, date);
         }
 
         TestDatabase.getInstance().saveOrder(token, order);
