@@ -32,11 +32,9 @@ public class OrderNonScheduled implements Order {
     @Override
     public double getTotalCommission() {
 
-            double cost = type.getCommission(reports);
-            if(priority.isCritical()){
-                cost += cost * priority.getCriticalLoading();
-            }
-            return cost;
+        double cost = type.getCommission(reports);
+        cost += cost * priority.getCriticalLoading();
+        return cost;
     }
 
     @Override

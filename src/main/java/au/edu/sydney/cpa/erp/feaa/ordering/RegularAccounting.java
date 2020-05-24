@@ -1,6 +1,4 @@
 package au.edu.sydney.cpa.erp.feaa.ordering;
-
-import au.edu.sydney.cpa.erp.ordering.Order;
 import au.edu.sydney.cpa.erp.ordering.Report;
 
 import java.util.Map;
@@ -16,7 +14,7 @@ public class RegularAccounting implements OrderType {
 
     @Override
     public double getCommission(Map<Report, Integer> reports) {
-        double cost = 0.0; //Normal Reg
+        double cost = 0.0;
         for (Report report : reports.keySet()) {
             cost += report.getCommission() * Math.min(maxCountedEmployees, reports.get(report));
         }
@@ -33,8 +31,4 @@ public class RegularAccounting implements OrderType {
         return isAudit;
     }
 
-    @Override
-    public String toString(){
-        return "Regular Acounting";
-    }
 }

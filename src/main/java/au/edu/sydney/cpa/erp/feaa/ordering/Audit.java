@@ -1,6 +1,5 @@
 package au.edu.sydney.cpa.erp.feaa.ordering;
 
-import au.edu.sydney.cpa.erp.ordering.Order;
 import au.edu.sydney.cpa.erp.ordering.Report;
 
 import java.util.Map;
@@ -15,7 +14,7 @@ public class Audit implements OrderType {
     }
     @Override
     public double getCommission(Map<Report, Integer> reports) {
-        double cost = 0.0; //Normal audit
+        double cost = 0.0;
         for (Report report : reports.keySet()) {
             cost += reports.get(report) * report.getCommission();
         }
@@ -32,9 +31,5 @@ public class Audit implements OrderType {
         return isAudit;
     }
 
-    @Override
-    public String toString(){
-        return "Audit";
-    }
 
 }
