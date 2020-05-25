@@ -1,7 +1,6 @@
 package au.edu.sydney.cpa.erp.feaa.reports;
 
 import au.edu.sydney.cpa.erp.ordering.Report;
-import com.google.common.primitives.ImmutableDoubleArray;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -11,11 +10,11 @@ public class ReportImpl implements Report {
     //Value Object requires it's values to be immutable
     private final String name;
     private final double commissionPerEmployee;
-    private final ImmutableDoubleArray legalData;
-    private final ImmutableDoubleArray cashFlowData;
-    private final ImmutableDoubleArray mergesData;
-    private final ImmutableDoubleArray tallyingData;
-    private final ImmutableDoubleArray deductionsData;
+    private final double[] legalData;
+    private final double[] cashFlowData;
+    private final double[] mergesData;
+    private final double[] tallyingData;
+    private final double[] deductionsData;
 
     public ReportImpl(String name,
                       double commissionPerEmployee,
@@ -26,12 +25,11 @@ public class ReportImpl implements Report {
                       double[] deductionsData) {
         this.name = name;
         this.commissionPerEmployee = commissionPerEmployee;
-        //All final values initialised to null (if value passed in is null) or an immutable double array
-        this.legalData = (legalData == null) ? null : ImmutableDoubleArray.copyOf(legalData);
-        this.cashFlowData = (cashFlowData == null) ? null : ImmutableDoubleArray.copyOf(cashFlowData);
-        this.mergesData = (mergesData == null) ? null : ImmutableDoubleArray.copyOf(mergesData);
-        this.tallyingData = (tallyingData == null) ? null : ImmutableDoubleArray.copyOf(tallyingData);
-        this.deductionsData = (deductionsData == null) ? null : ImmutableDoubleArray.copyOf(deductionsData);
+        this.legalData = (legalData == null) ? null : ReportDataFactory.createArray(clone);
+        this.cashFlowData = (cashFlowData == null) ? null : ReportDataFactory.createArray(cashFlowData.clone());
+        this.mergesData = (mergesData == null) ? null : ReportDataFactory.createArray(mergesData.clone());
+        this.tallyingData = (tallyingData == null) ? null : ReportDataFactory.createArray(tallyingData.clone());
+        this.deductionsData = (deductionsData == null) ? null : ReportDataFactory.createArray(deductionsData.clone());
     }
 
     @Override
@@ -50,62 +48,27 @@ public class ReportImpl implements Report {
 
     @Override
     public double[] getLegalData() {
-        if(legalData == null) {
-            return null;
-        }
-        double[] legalDataArray = new double[legalData.length()];
-        for(int i = 0; i < legalData.length(); i++) {
-            legalDataArray[i] = legalData.get(i);
-        }
-        return legalDataArray;
+        return legalData == null ? null : legalData.clone();
     }
 
     @Override
     public double[] getCashFlowData() {
-        if(cashFlowData == null) {
-            return null;
-        }
-        double[] cashFlowDataArray = new double[cashFlowData.length()];
-        for(int i = 0; i < cashFlowData.length(); i++) {
-            cashFlowDataArray[i] =  cashFlowData.get(i);
-        }
-        return cashFlowDataArray;
+        return cashFlowData == null ? null : cashFlowData.clone();
     }
 
     @Override
     public double[] getMergesData() {
-        if(mergesData == null) {
-            return null;
-        }
-        double[] mergesDataArray = new double[mergesData.length()];
-        for(int i = 0; i < mergesData.length(); i++){
-            mergesDataArray[i] = mergesData.get(i);
-        }
-        return mergesDataArray;
+        return mergesData == null ? null : mergesData.clone();
     }
 
     @Override
     public double[] getTallyingData() {
-        if(tallyingData == null) {
-            return null;
-        }
-        double[] tallyDataArray = new double[tallyingData.length()];
-        for(int i = 0; i < tallyingData.length(); i++){
-            tallyDataArray[i] = tallyingData.get(i);
-        }
-        return tallyDataArray;
+        return tallyingData == null ? null : tallyingData.clone();
     }
 
     @Override
     public double[] getDeductionsData() {
-        if(deductionsData == null){
-            return null;
-        }
-        double[] deductionsArray = new double[deductionsData.length()];
-        for(int i = 0; i < deductionsData.length(); i++){
-            deductionsArray[i] = deductionsData.get(i);
-        }
-        return deductionsArray;
+        return deductionsData == null ? null : deductionsData.clone();
     }
 
     @Override
@@ -126,11 +89,11 @@ public class ReportImpl implements Report {
     public boolean equals(ReportImpl other) {
         if (this.getCommission() == other.getCommission() &&
                 this.name.equals(other.getReportName()) &&
-                Arrays.equals(this.getLegalData(), other.getLegalData()) &&
-                Arrays.equals(this.getCashFlowData(), other.getCashFlowData()) &&
-                Arrays.equals(this.getMergesData(), other.getMergesData()) &&
-                Arrays.equals(this.getTallyingData(), other.getTallyingData()) &&
-                Arrays.equals(this.getDeductionsData(), other.getDeductionsData())) {
+                Arrays.equals(legalData, other.getLegalData()) &&
+                Arrays.equals(cashFlowData, other.getCashFlowData()) &&
+                Arrays.equals(mergesData, other.getMergesData()) &&
+                Arrays.equals(tallyingData, other.getTallyingData()) &&
+                Arrays.equals(deductionsData, other.getDeductionsData())) {
             return true;
         }
         return false;
