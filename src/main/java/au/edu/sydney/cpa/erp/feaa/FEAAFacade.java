@@ -82,6 +82,7 @@ public class FEAAFacade {
         }
 
         TestDatabase.getInstance().saveOrder(token, order);
+        //uow.registerNew(order); //unfinished
         return order.getOrderID();
     }
 
@@ -179,11 +180,14 @@ public class FEAAFacade {
         Order order = TestDatabase.getInstance().getOrder(token, orderID);
 
         order.finalise();
+        //uow.registerDirty(order); //unfinished
+        //uow.commit(); //unfinished
         TestDatabase.getInstance().saveOrder(token, order);
         return ContactHandler.sendInvoice(token, getClient(order.getClient()), contactPriorityAsMethods, order.generateInvoiceData());
     }
 
     public void logout() {
+        //uow.commit(); //unfinished
         AuthModule.logout(token);
         token = null;
     }
