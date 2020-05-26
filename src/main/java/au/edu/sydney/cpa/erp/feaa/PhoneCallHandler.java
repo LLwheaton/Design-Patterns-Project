@@ -4,7 +4,11 @@ import au.edu.sydney.cpa.erp.auth.AuthToken;
 import au.edu.sydney.cpa.erp.contact.PhoneCall;
 import au.edu.sydney.cpa.erp.ordering.Client;
 
-public class PhoneCallHandler implements ContactMethod{
+/**
+ * Implements ContactMethod interface. Used as one of the handlers for
+ * Chain of Responsibility pattern for handling of client contact methods.
+ */
+public class PhoneCallHandler implements ContactMethod {
 
     private ContactMethod next;
 

@@ -3,7 +3,6 @@ package au.edu.sydney.cpa.erp.feaa.ordering;
 import au.edu.sydney.cpa.erp.ordering.Order;
 import au.edu.sydney.cpa.erp.ordering.Report;
 import au.edu.sydney.cpa.erp.ordering.ScheduledOrder;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -11,6 +10,12 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Implements the ScheduledOrder interface, and also inherits OrderNonScheduled. Several methods
+ * are overridden from the Parent class to account for the differences between Scheduled and NonScheduled Orders.
+ * This is a big improvement over the original application because there is now only one Scheduled class, and only
+ * one NonScheduled class. This is part of the Bridge pattern.
+ */
 public class OrderScheduled extends OrderNonScheduled implements ScheduledOrder {
 
     private int numQuarters;
@@ -25,20 +30,29 @@ public class OrderScheduled extends OrderNonScheduled implements ScheduledOrder 
         return super.getTotalCommission();
     }
 
+    /*
+       Unique to Scheduled
+     */
     @Override
     public int getNumberOfQuarters() {
         return numQuarters;
     }
 
+    /*
+       Total commission for Scheduled Orders include numQuarters
+     */
     @Override
     public double getTotalCommission() {
         return super.getTotalCommission() * numQuarters;
     }
 
+    /*
+       Different variations of this method existed, and is fixed using some Boolean checks.
+     */
     @Override
     public String generateInvoiceData() {
 
-        if(getPriority().isCritical()){
+        if(getPriority().isCritical()) { //Critical Orders return a smaller String
             return String.format("Your priority business account will be charged: $%,.2f each quarter for %d quarters, with a total overall cost of: $%,.2f" +
                     "\nPlease see your internal accounting department for itemised details.", getRecurringCost(), getNumberOfQuarters(), getTotalCommission());
         } else {
@@ -62,7 +76,7 @@ public class OrderScheduled extends OrderNonScheduled implements ScheduledOrder 
                 sb.append(reports.get(report));
                 sb.append("\tCost per employee: ");
                 sb.append(String.format("$%,.2f", report.getCommission()));
-                if(!getOrderType().isAudit()){ //Modified here
+                if(!getOrderType().isAudit()) { //Boolean check needed for Audits
                     if (reports.get(report) > getOrderType().getMaxCountedEmployees()) {
                         sb.append("\tThis report cost has been capped.");
                     }
@@ -92,6 +106,10 @@ public class OrderScheduled extends OrderNonScheduled implements ScheduledOrder 
         return String.format("ID:%s $%,.2f per quarter, $%,.2f total", super.getOrderID(), getRecurringCost(), getTotalCommission());
     }
 
+    /*
+       Multiple variations of this method existed, so Boolean checks were needed to ensure String
+       was correctly generated.
+     */
     @Override
     public String longDesc() {
 
@@ -105,7 +123,7 @@ public class OrderScheduled extends OrderNonScheduled implements ScheduledOrder 
 
         for (Report report : keyList) {
             double subtotal;
-            if(getOrderType().isAudit()){
+            if(getOrderType().isAudit()) { //Boolean check for Audits
                 subtotal = report.getCommission() * super.getReports().get(report);
 
             } else {
@@ -120,7 +138,7 @@ public class OrderScheduled extends OrderNonScheduled implements ScheduledOrder 
                     subtotal));
 
 
-            if(!getOrderType().isAudit()){ //This is to avoid instanceof
+            if(!getOrderType().isAudit()) {
                 if (super.getReports().get(report) > getOrderType().getMaxCountedEmployees()) {
                     reportSB.append(" *CAPPED*\n");
                 } else {
@@ -149,10 +167,6 @@ public class OrderScheduled extends OrderNonScheduled implements ScheduledOrder 
                     loadedCostPerQuarter,
                     totalLoadedCost
             );
-            //System.out.println(r);
-            //System.out.println("priority: " + getPriority().toString());
-            //System.out.println("type: " + getOrderType().toString());
-            //System.out.println("totalBaseCost: " +totalBaseCost);
             return r;
         } else {
             String r =  String.format(super.isFinalised() ? "" : "*NOT FINALISED*\n" +
@@ -171,12 +185,7 @@ public class OrderScheduled extends OrderNonScheduled implements ScheduledOrder 
                     this.getTotalCommission()
 
             );
-            //System.out.println(r);
-            //System.out.println("priority: " + getPriority().toString());
-            //System.out.println("type: " + getOrderType().toString());
-            //System.out.println("max employees: " + type.getMaxCountedEmployees());
             return r;
         }
-
     }
 }

@@ -4,6 +4,10 @@ import au.edu.sydney.cpa.erp.auth.AuthToken;
 import au.edu.sydney.cpa.erp.contact.InternalAccounting;
 import au.edu.sydney.cpa.erp.ordering.Client;
 
+/**
+ * Implements ContactMethod interface. Used as one of the handlers for
+ * Chain of Responsibility pattern for handling of client contact methods.
+ */
 public class InternalAccountingHandler implements ContactMethod {
 
     private ContactMethod next;

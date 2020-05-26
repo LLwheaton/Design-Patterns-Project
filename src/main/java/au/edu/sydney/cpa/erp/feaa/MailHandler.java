@@ -4,7 +4,11 @@ import au.edu.sydney.cpa.erp.auth.AuthToken;
 import au.edu.sydney.cpa.erp.contact.Mail;
 import au.edu.sydney.cpa.erp.ordering.Client;
 
-public class MailHandler implements ContactMethod{
+/**
+ * Implements ContactMethod interface. Used as one of the handlers for
+ * Chain of Responsibility pattern for handling of client contact methods.
+ */
+public class MailHandler implements ContactMethod {
 
     private ContactMethod next;
 

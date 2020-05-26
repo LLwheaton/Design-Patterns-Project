@@ -163,11 +163,11 @@ public class AllowedScopeTest {
         String patternString = "\\*NOT FINALISED\\*\\nOrder details \\(id #0\\)\\nDate: [0-9]{4}-[0-9]{2}-[0-9]{2}\\nReports:\\n\\tReport name: Fake Product\\tEmployee Count: 30\\tCommission per employee: \\$100.00\\tSubtotal: \\$3,000.00\\n\\tReport name: Fake Report 2\\tEmployee Count: 1\\tCommission per employee: \\$300.00\\tSubtotal: \\$300.00\\nCritical Loading: \\$330.00\\nTotal cost: \\$3,630.00\\n";
         Pattern pattern = Pattern.compile(patternString, Pattern.MULTILINE);
 
-        assertTrue(pattern.matcher(order.longDesc()).matches());
+        assertTrue( pattern.matcher(order.longDesc()).matches());
 
-        assertEquals("ID:0 $3,630.00", order.shortDesc());
+        assertEquals( "ID:0 $3,630.00", order.shortDesc());
 
-        assertEquals("Your priority business account has been charged: $3,630.00\n" +
+        assertEquals( "Your priority business account has been charged: $3,630.00\n" +
                 "Please see your internal accounting department for itemised details.", order.generateInvoiceData());
 
         assertNotSame(order, order.copy());
@@ -196,11 +196,11 @@ public class AllowedScopeTest {
         String patternString = "\\*NOT FINALISED\\*\\nOrder details \\(id #0\\)\\nDate: [0-9]{4}-[0-9]{2}-[0-9]{2}\\nNumber of quarters: 10\\nReports:\\n\\tReport name: Fake Product\\tEmployee Count: 30\\tCommission per employee: \\$100.00\\tSubtotal: \\$3,000.00\\n\\tReport name: Fake Report 2\\tEmployee Count: 1\\tCommission per employee: \\$300.00\tSubtotal: \\$300.00\\nCritical Loading: \\$3,300.00\\nRecurring cost: \\$3,630.00\\nTotal cost: \\$36,300.00\\n";
         Pattern pattern = Pattern.compile(patternString, Pattern.MULTILINE);
 
-        assertTrue(pattern.matcher(order.longDesc()).matches());
+        assertTrue( pattern.matcher(order.longDesc()).matches());
 
-        assertEquals("ID:0 $3,630.00 per quarter, $36,300.00 total", order.shortDesc());
+        assertEquals( "ID:0 $3,630.00 per quarter, $36,300.00 total", order.shortDesc());
 
-        assertEquals("Your priority business account will be charged: $3,630.00 each quarter for 10 quarters, with a total overall cost of: $36,300.00\n" +
+        assertEquals( "Your priority business account will be charged: $3,630.00 each quarter for 10 quarters, with a total overall cost of: $36,300.00\n" +
                 "Please see your internal accounting department for itemised details.", order.generateInvoiceData());
 
         assertNotSame(order, order.copy());
@@ -262,11 +262,11 @@ public class AllowedScopeTest {
 
         Pattern pattern = Pattern.compile(patternString, Pattern.MULTILINE);
 
-        assertTrue(pattern.matcher(order.longDesc()).matches());
+        assertTrue( pattern.matcher(order.longDesc()).matches());
 
-        assertEquals(14300, order.getTotalCommission(), 0.0001);
+        assertEquals( 14300, order.getTotalCommission(), 0.0001);
 
-        assertEquals("ID:0 $1,430.00 per quarter, $14,300.00 total", order.shortDesc());
+        assertEquals( "ID:0 $1,430.00 per quarter, $14,300.00 total", order.shortDesc());
 
         assertEquals("Your priority business account will be charged: $1,430.00 each quarter for 10 quarters, with a total overall cost of: $14,300.00\n" +
                 "Please see your internal accounting department for itemised details.", order.generateInvoiceData());
@@ -298,7 +298,7 @@ public class AllowedScopeTest {
 
         Pattern pattern = Pattern.compile(patternString, Pattern.MULTILINE);
 
-        assertTrue(pattern.matcher(order.longDesc()).matches());
+        assertTrue( pattern.matcher(order.longDesc()).matches());
 
         assertEquals("ID:0 $1,300.00", order.shortDesc());
 
@@ -333,11 +333,11 @@ public class AllowedScopeTest {
 
         Pattern pattern = Pattern.compile(patternString, Pattern.MULTILINE);
 
-        assertTrue(pattern.matcher(order.longDesc()).matches());
+        assertTrue( pattern.matcher(order.longDesc()).matches());
 
-        assertEquals(13000, order.getTotalCommission(), 0.0001);
+        assertEquals( 13000, order.getTotalCommission(), 0.0001);
 
-        assertEquals("ID:0 $1,300.00 per quarter, $13,000.00 total", order.shortDesc());
+        assertEquals( "ID:0 $1,300.00 per quarter, $13,000.00 total", order.shortDesc());
 
         assertEquals("Thank you for your Crimson Permanent Assurance accounting order!\n" +
                 "The cost to provide these services: $1,300.00 each quarter, with a total overall cost of: $13,000.00\n" +
@@ -370,7 +370,7 @@ public class AllowedScopeTest {
 
         Pattern pattern = Pattern.compile(patternString, Pattern.MULTILINE);
 
-        assertTrue(pattern.matcher(order.longDesc()).matches());
+        assertTrue( pattern.matcher(order.longDesc()).matches());
 
         assertEquals(1300, order.getTotalCommission(), 0.0001);
         assertEquals("ID:0 $1,300.00", order.shortDesc());
@@ -411,7 +411,7 @@ public class AllowedScopeTest {
         assertEquals(13000, order.getTotalCommission(), 0.0001);
         assertEquals("ID:0 $1,300.00 per quarter, $13,000.00 total", order.shortDesc());
 
-        assertEquals("Thank you for your Crimson Permanent Assurance accounting order!\n" +
+        assertEquals( "Thank you for your Crimson Permanent Assurance accounting order!\n" +
                 "The cost to provide these services: $1,300.00 each quarter, with a total overall cost of: $13,000.00\n" +
                 "Please see below for details:\n" +
                 "\tReport name: Fake Product\tEmployee Count: 10\tCost per employee: $100.00\tSubtotal: $1,000.00\n" +
@@ -524,34 +524,34 @@ public class AllowedScopeTest {
         verifyNoMoreInteractions(mockedDB);
     }
 
-    @Test
-    public void getAllReports() {
-        boolean thrown = false;
-        try {
-            facade.getAllReports();
-        } catch (SecurityException ignored) {
-            thrown = true;
-        }
-
-        assertTrue(thrown);
-
-        setupLogin();
-        doThrow(new AssertionError("Unexpected Logout Interaction")).when(AuthModule.class);
-        AuthModule.logout(any());
-
-        mockStatic(ReportDatabase.class);
-
-        Collection<Report> response = Collections.singletonList(new ReportImpl("test report", 1.0, null, null, null, null, null));
-
-        when(ReportDatabase.getTestReports()).thenReturn(response);
-
-        assertEquals(response, facade.getAllReports());
-
-        verifyStatic(ReportDatabase.class);
-        ReportDatabase.getTestReports();
-        long t = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-        System.out.println("Allowed scope case: " + t/1024/1024); //MB
-    }
+//    @Test////////////////////////////////////////comment out to go faster
+//    public void getAllReports() {
+//        boolean thrown = false;
+//        try {
+//            facade.getAllReports();
+//        } catch (SecurityException ignored) {
+//            thrown = true;
+//        }
+//
+//        assertTrue(thrown);
+//
+//        setupLogin();
+//        doThrow(new AssertionError("Unexpected Logout Interaction")).when(AuthModule.class);
+//        AuthModule.logout(any());
+//
+//        mockStatic(ReportDatabase.class);
+//
+//        Collection<Report> response = Collections.singletonList(new ReportImpl("test report", 1.0, null, null, null, null, null));
+//
+//        when(ReportDatabase.getTestReports()).thenReturn(response);
+//
+//        assertEquals(response, facade.getAllReports());
+//
+//        verifyStatic(ReportDatabase.class);
+//        ReportDatabase.getTestReports();
+//        long t = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+//        System.out.println("Allowed scope case: " + t/1024/1024); //MB
+//    }
 
     @Test
     public void finaliseOrder() {

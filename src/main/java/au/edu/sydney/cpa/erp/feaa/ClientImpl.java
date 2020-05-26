@@ -3,12 +3,17 @@ package au.edu.sydney.cpa.erp.feaa;
 import au.edu.sydney.cpa.erp.auth.AuthToken;
 import au.edu.sydney.cpa.erp.database.TestDatabase;
 import au.edu.sydney.cpa.erp.ordering.Client;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+/**
+ * This class was implemented with Lazy Load pattern. Instead of pulling
+ * all the data from the database at the start, the value is only initialised
+ * when it is actually needed, which removes the lag in CLI when loading Client information.
+ * To allow for values to be null, a list is maintained of values already loaded. This works
+ * by the getter methods first checking this list - if it exists, return it, otherwise initialise
+ * by pulling the value from the database, then adding it to the list.
+ */
 public class ClientImpl implements Client {
 
     private final int id;
@@ -25,12 +30,8 @@ public class ClientImpl implements Client {
     private String businessName;
     private String pigeonCoopID;
 
-    private List<String> loadedValues = new ArrayList<>();
+    private final List<String> loadedValues = new ArrayList<>();
 
-    //Lazy load, initialising all values in constructor was removed
-    //Now each getter initialises the value in order to return it, so
-    //it only gets initialised when it's actually needed, instead of all
-    //at the start
     public ClientImpl(AuthToken token, int id) {
 
         this.id = id;

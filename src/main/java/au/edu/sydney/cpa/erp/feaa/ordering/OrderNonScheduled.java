@@ -2,11 +2,18 @@ package au.edu.sydney.cpa.erp.feaa.ordering;
 
 import au.edu.sydney.cpa.erp.ordering.Order;
 import au.edu.sydney.cpa.erp.ordering.Report;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+/**
+ * One of the main components of Bridge pattern, this class contains the bulk of the shared methods
+ * between Orders. Any variations between the original Order classes (now removed) are handled
+ * appropriately here, occasionally using information from OrderPriority and OrderType if needed.
+ *
+ * There are two kinds of priority: Critical and Normal
+ * There are two kinds of types: Audit and RegularAccounting
+ */
 public class OrderNonScheduled implements Order {
     private Map<Report, Integer> reports = new HashMap<>();
     private final OrderPriority priority;
@@ -16,7 +23,7 @@ public class OrderNonScheduled implements Order {
     private LocalDateTime date;
     private boolean finalised = false;
 
-    public OrderNonScheduled(OrderPriority priority, OrderType type, int id, int client, LocalDateTime date){
+    public OrderNonScheduled(OrderPriority priority, OrderType type, int id, int client, LocalDateTime date) {
         this.priority = priority;
         this.type = type;
         this.id = id;
@@ -29,9 +36,13 @@ public class OrderNonScheduled implements Order {
         return id;
     }
 
+    /**
+     * In the original application code, this method had multiple variations. To solve this I broke it up
+     * to its most basic parts (seen below) and call on type and priority to add their parts if needed.
+     * @return The total commission as a double
+     */
     @Override
     public double getTotalCommission() {
-
         double cost = type.getCommission(reports);
         cost += cost * priority.getCriticalLoading();
         return cost;
@@ -42,24 +53,16 @@ public class OrderNonScheduled implements Order {
         return date;
     }
 
+    /*
+       Initially, this method had a long check for equality between Report objects,
+       however since the Reports are now using the Value Object pattern, the equality
+       check can be removed, as the Map can do this for us (by comparing hash codes).
+     */
     @Override
     public void setReport(Report report, int employeeCount) {
-        if (finalised) throw new IllegalStateException("Order was already finalised.");
-
-        // We can't rely on equal reports having the same object identity since they get
-        // rebuilt over the network, so we have to check for presence and same values
-
-        //Removed long check for equality and replaced with equals method
-//        for (Report contained: reports.keySet()) {
-//            if (contained.equals(report)) {
-//                report = contained;
-//                break;
-//            }
-//        }
-
-        //Reports are Value Objects, so two of the same report will have the same hash value, thus the equality
-        //check is no longer needed, since put() will just update the value (if key is equal), or add if it's new.
-
+        if(finalised) {
+            throw new IllegalStateException("Order was already finalised.");
+        }
         reports.put(report, employeeCount);
     }
 
@@ -68,28 +71,22 @@ public class OrderNonScheduled implements Order {
         return reports.keySet();
     }
 
+    /*
+       Another equality check was removed here due to the Reports now being Value Objects.
+     */
     @Override
     public int getReportEmployeeCount(Report report) {
-        // We can't rely on equal reports having the same object identity since they get
-        // rebuilt over the network, so we have to check for presence and same values
-
-        //Removed long check for equality and replaced with equals method
-//        for (Report contained: reports.keySet()) {
-//            if (contained.equals(report)) {
-//                report = contained;
-//                break;
-//            }
-//        }
-        //Again, since report is a value object, equality check can be taken out since in a map
-        //reports with the same hash code (reports are equal to eachother) will just update the value
-        //otherwise add if new
         Integer result = reports.get(report);
         return null == result ? 0 : result;
     }
 
+    /*
+       Another method that had multiple variations. A few Boolean checks here for isAudit or isCritical were used
+       to avoid using instanceof, but were also necessary to ensure Orders generated the invoice data String correctly.
+     */
     @Override
     public String generateInvoiceData() {
-        if(priority.isCritical()){
+        if(priority.isCritical()) { //Boolean check for Critical Orders
             return String.format("Your priority business account has been charged: $%,.2f" +
                     "\nPlease see your internal accounting department for itemised details.", getTotalCommission());
         } else {
@@ -105,7 +102,7 @@ public class OrderNonScheduled implements Order {
 
             for (Report report : keyList) {
                 double subtotal;
-                if(type.isAudit()){
+                if(type.isAudit()) { //Boolean check needed for Audit classes
                     subtotal = report.getCommission() * reports.get(report);
                 } else {
                     subtotal = report.getCommission() * Math.min(type.getMaxCountedEmployees(), reports.get(report));
@@ -117,7 +114,7 @@ public class OrderNonScheduled implements Order {
                 sb.append(reports.get(report));
                 sb.append("\tCost per employee: ");
                 sb.append(String.format("$%,.2f", report.getCommission()));
-                if(!type.isAudit()){
+                if(!type.isAudit()) {
                     if (reports.get(report) > type.getMaxCountedEmployees()) {
                         sb.append("\tThis report cost has been capped.");
                     }
@@ -141,10 +138,13 @@ public class OrderNonScheduled implements Order {
 
     @Override
     public Order copy() {
-        //Do I need to copy priority and type differently?
-        Order copy = new OrderNonScheduled(priority, type, id, client, date); //todo **********************
-        for(Report report : reports.keySet()){
+        Order copy = new OrderNonScheduled(priority, type, id, client, date);
+        for(Report report : reports.keySet()) {
             copy.setReport(report, reports.get(report));
+        }
+        //Bug fixed: copy of the Order is now finalised if original was
+        if(finalised) {
+            copy.finalise();
         }
         return copy;
     }
@@ -154,6 +154,10 @@ public class OrderNonScheduled implements Order {
         return String.format("ID:%s $%,.2f", id, getTotalCommission());
     }
 
+    /*
+       Another method with multiple variations. A few Boolean checks were needed (like some previous methods) to make
+       sure the final String for different Orders was constructed correctly.
+     */
     @Override
     public String longDesc() {
         double baseCommission = 0.0;
@@ -163,9 +167,9 @@ public class OrderNonScheduled implements Order {
         List<Report> keyList = new ArrayList<>(reports.keySet());
         keyList.sort(Comparator.comparing(Report::getReportName).thenComparing(Report::getCommission));
 
-        for(Report report : keyList){
+        for(Report report : keyList) {
             double subtotal;
-            if(type.isAudit()){
+            if(type.isAudit()) {
                 subtotal = report.getCommission() * reports.get(report);
             } else {
                 subtotal = report.getCommission() * Math.min(type.getMaxCountedEmployees(), reports.get(report));
@@ -177,7 +181,7 @@ public class OrderNonScheduled implements Order {
                     reports.get(report),
                     report.getCommission(),
                     subtotal));
-            if(!type.isAudit()){ //This is to avoid instanceof
+            if(!type.isAudit()) {
                 if (reports.get(report) > type.getMaxCountedEmployees()) {
                     reportSB.append(" *CAPPED*\n");
                 } else {
@@ -186,9 +190,8 @@ public class OrderNonScheduled implements Order {
             } else {
                 reportSB.append("\n");
             }
-
         }
-        if(priority.isCritical()){
+        if(priority.isCritical()) { //Boolean check for critical orders, which have an extra line
             String r = String.format(finalised ? "" : "*NOT FINALISED*\n" +
                             "Order details (id #%d)\n" +
                             "Date: %s\n" +
@@ -202,10 +205,6 @@ public class OrderNonScheduled implements Order {
                     loadedCommission - baseCommission,
                     loadedCommission
             );
-//            System.out.println(r);
-//            System.out.println("priority: " + priority.toString());
-//            System.out.println("type: " + type.toString());
-//            System.out.println("max employees: " + type.getMaxCountedEmployees());
             return r;
         } else {
             String r = String.format(finalised ? "" : "*NOT FINALISED*\n" +
@@ -219,10 +218,6 @@ public class OrderNonScheduled implements Order {
                     reportSB.toString(),
                     getTotalCommission()
             );
-//            System.out.println(r);
-//            System.out.println("priority: " + priority.toString());
-//            System.out.println("type: " + type.toString());
-//            System.out.println("max employees: " + type.getMaxCountedEmployees());
             return r;
         }
     }
@@ -235,11 +230,11 @@ public class OrderNonScheduled implements Order {
         return finalised;
     }
 
-    protected OrderType getOrderType(){
+    protected OrderType getOrderType() {
         return type;
     }
 
-    protected OrderPriority getPriority(){
+    protected OrderPriority getPriority() {
         return priority;
     }
 }

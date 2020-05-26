@@ -1,13 +1,16 @@
 package au.edu.sydney.cpa.erp.feaa.reports;
 
 import au.edu.sydney.cpa.erp.ordering.Report;
-
 import java.util.Arrays;
 import java.util.Objects;
 
+/**
+ * Implements Report using the Value Object pattern. This requires it's values to be
+ * immutable. This is achieved by using 'final', as well as creating clones of arrays
+ * as needed. Flyweight is also used here to cache the values to reduce RAM usage.
+ */
 public class ReportImpl implements Report {
 
-    //Value Object requires it's values to be immutable
     private final String name;
     private final double commissionPerEmployee;
     private final double[] legalData;
@@ -23,28 +26,24 @@ public class ReportImpl implements Report {
                       double[] mergesData,
                       double[] tallyingData,
                       double[] deductionsData) {
-        this.name = name;
-        this.commissionPerEmployee = commissionPerEmployee;
-        this.legalData = (legalData == null) ? null : ReportDataFactory.createArray(clone);
-        this.cashFlowData = (cashFlowData == null) ? null : ReportDataFactory.createArray(cashFlowData.clone());
-        this.mergesData = (mergesData == null) ? null : ReportDataFactory.createArray(mergesData.clone());
-        this.tallyingData = (tallyingData == null) ? null : ReportDataFactory.createArray(tallyingData.clone());
-        this.deductionsData = (deductionsData == null) ? null : ReportDataFactory.createArray(deductionsData.clone());
+        this.name = ReportData.createName(name);
+        this.commissionPerEmployee = ReportData.createCommission(commissionPerEmployee);
+        this.legalData = (legalData == null) ? null : ReportData.createArray(legalData.clone());
+        this.cashFlowData = (cashFlowData == null) ? null : ReportData.createArray(cashFlowData.clone());
+        this.mergesData = (mergesData == null) ? null : ReportData.createArray(mergesData.clone());
+        this.tallyingData = (tallyingData == null) ? null : ReportData.createArray(tallyingData.clone());
+        this.deductionsData = (deductionsData == null) ? null : ReportData.createArray(deductionsData.clone());
     }
 
     @Override
     public String getReportName() {
-        return name;
+        return new String(name);
     }
 
     @Override
     public double getCommission() {
         return commissionPerEmployee;
     }
-
-    /*
-    * All getters below now return null or a double[] array type
-    * * */
 
     @Override
     public double[] getLegalData() {
@@ -77,7 +76,7 @@ public class ReportImpl implements Report {
         return String.format("%s", name);
     }
 
-    //Makes sure it is of ReportImpl type and calls equals method
+    /* Makes sure it is of ReportImpl type and calls equals method */
     public boolean equals(Object other) {
         if(!(other instanceof ReportImpl)) {
             return false;
@@ -85,7 +84,7 @@ public class ReportImpl implements Report {
         return equals((ReportImpl)other);
     }
 
-    //checking for equality between all variables
+    /* Check for equality involves comparing all values inside ReportImpl */
     public boolean equals(ReportImpl other) {
         if (this.getCommission() == other.getCommission() &&
                 this.name.equals(other.getReportName()) &&
@@ -98,7 +97,8 @@ public class ReportImpl implements Report {
         }
         return false;
     }
-    //hash code is combined objects
+
+    /* Hash code is combined values */
     public int hashCode() {
         return Objects.hash(name, commissionPerEmployee, legalData, cashFlowData, mergesData, tallyingData, deductionsData);
     }

@@ -8,7 +8,6 @@ import au.edu.sydney.cpa.erp.ordering.Order;
 import au.edu.sydney.cpa.erp.ordering.Report;
 import au.edu.sydney.cpa.erp.feaa.ordering.*;
 import au.edu.sydney.cpa.erp.feaa.reports.ReportDatabase;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,9 +16,12 @@ import java.util.List;
 @SuppressWarnings("Duplicates")
 public class FEAAFacade {
     private AuthToken token;
+    private UnitOfWork uow;
 
     public boolean login(String userName, String password) {
         token = AuthModule.login(userName, password);
+
+        uow = new UnitOfWork(token);
 
         return null != token;
     }
@@ -59,16 +61,19 @@ public class FEAAFacade {
 
         OrderPriority priority;
         OrderType type;
-        if(isCritical){
+        if(isCritical) {
             priority = new CriticalPriority(criticalLoading);
         } else {
             priority = new NormalPriority();
         }
-        if(1 == orderType){
+
+        if(1 == orderType) {
             type = new RegularAccounting(maxCountedEmployees);
         } else if (2 == orderType) {
             type = new Audit();
-        } else { return null; }
+        } else {
+            return null;
+        }
 
         if (isScheduled) {
             order = new OrderScheduled(priority, type, id, clientID, date, numQuarters);
@@ -111,13 +116,17 @@ public class FEAAFacade {
             throw new SecurityException();
         }
 
-        //Added, will need to remove before final submission*****************************
+        //Added, will need to remove before final submission**************************************
         long t = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
         System.out.println("FEAAFacade.getAllReports ram used: " + t/1024/1024); //MB
 
         return new ArrayList<>(ReportDatabase.getTestReports());
     }
 
+    /*
+       The switch case in this method originally used Enums, this was changed to create
+       new Handlers for the Chain of Responsibility pattern.
+     */
     public boolean finaliseOrder(int orderID, List<String> contactPriority) {
         if (null == token) {
             throw new SecurityException();
@@ -125,7 +134,6 @@ public class FEAAFacade {
 
         List<ContactMethod> contactPriorityAsMethods = new ArrayList<>();
 
-        //Based on user input, create a new Handler and add it to the list (this is a replacement for enums)
         if (null != contactPriority) {
             for (String method: contactPriority) {
                 switch (method.toLowerCase()) {
@@ -153,20 +161,18 @@ public class FEAAFacade {
             }
         }
 
-        //Default list also includes new Handlers instead of enums
-        if (contactPriorityAsMethods.size() == 0) { // needs setting to default
+        /*
+           If the list is size 0, it needs to be set to default contact methods
+           for the client. Originally there were Enums here but they are now replaced
+           with the created of new Handlers for the Chain of Responsibility pattern.
+         */
+        if (contactPriorityAsMethods.size() == 0) {
             contactPriorityAsMethods = Arrays.asList(
-//                    ContactMethod.INTERNAL_ACCOUNTING,
-//                    ContactMethod.EMAIL,
-//                    ContactMethod.CARRIER_PIGEON,
-//                    ContactMethod.MAIL,
-//                    ContactMethod.PHONECALL
                     new InternalAccountingHandler(),
                     new EmailHandler(),
                     new CarrierPidgeonHandler(),
                     new MailHandler(),
                     new PhoneCallHandler()
-
             );
         }
 
