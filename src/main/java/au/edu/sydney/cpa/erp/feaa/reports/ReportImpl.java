@@ -1,3 +1,4 @@
+// Modified class
 package au.edu.sydney.cpa.erp.feaa.reports;
 
 import au.edu.sydney.cpa.erp.ordering.Report;
@@ -5,7 +6,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 /**
- * Implements Report using the Value Object pattern. This requires it's values to be
+ * Implements Report interface using the Value Object pattern. This requires it's values to be
  * immutable. This is achieved by using 'final', as well as creating clones of arrays
  * as needed. Flyweight is also used here to cache the values to reduce RAM usage.
  */
@@ -76,7 +77,10 @@ public class ReportImpl implements Report {
         return String.format("%s", name);
     }
 
-    /* Makes sure it is of ReportImpl type and calls equals method */
+    /*
+      Added method for Value Object
+      Makes sure it is of ReportImpl type and calls equals method
+     */
     public boolean equals(Object other) {
         if(!(other instanceof ReportImpl)) {
             return false;
@@ -84,7 +88,10 @@ public class ReportImpl implements Report {
         return equals((ReportImpl)other);
     }
 
-    /* Check for equality involves comparing all values inside ReportImpl */
+    /*
+      Added method for Value Object
+      Check for equality involves comparing all values inside ReportImpl
+     */
     public boolean equals(ReportImpl other) {
         if (this.getCommission() == other.getCommission() &&
                 this.name.equals(other.getReportName()) &&
@@ -98,7 +105,10 @@ public class ReportImpl implements Report {
         return false;
     }
 
-    /* Hash code is combined values */
+    /*
+      Added method for Value Object
+      Hash code is combined values
+     */
     public int hashCode() {
         return Objects.hash(name, commissionPerEmployee, legalData, cashFlowData, mergesData, tallyingData, deductionsData);
     }

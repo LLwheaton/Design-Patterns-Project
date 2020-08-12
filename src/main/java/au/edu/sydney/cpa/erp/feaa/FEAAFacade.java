@@ -1,3 +1,4 @@
+// Class modified
 package au.edu.sydney.cpa.erp.feaa;
 
 import au.edu.sydney.cpa.erp.auth.AuthModule;
@@ -16,12 +17,9 @@ import java.util.List;
 @SuppressWarnings("Duplicates")
 public class FEAAFacade {
     private AuthToken token;
-    private UnitOfWork uow;
 
     public boolean login(String userName, String password) {
         token = AuthModule.login(userName, password);
-
-        uow = new UnitOfWork(token);
 
         return null != token;
     }
@@ -44,6 +42,10 @@ public class FEAAFacade {
         return result;
     }
 
+    /*
+      Removed long/tangled conditional statement in favor of three shorter ones after the implementation
+      of the Bridge pattern.
+     */
     public Integer createOrder(int clientID, LocalDateTime date, boolean isCritical, boolean isScheduled, int orderType, int criticalLoadingRaw, int maxCountedEmployees, int numQuarters) {
         if (null == token) {
             throw new SecurityException();
@@ -82,7 +84,6 @@ public class FEAAFacade {
         }
 
         TestDatabase.getInstance().saveOrder(token, order);
-        //uow.registerNew(order); //unfinished
         return order.getOrderID();
     }
 
@@ -117,9 +118,9 @@ public class FEAAFacade {
             throw new SecurityException();
         }
 
-        //Added, will need to remove before final submission**************************************
-        long t = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-        System.out.println("FEAAFacade.getAllReports ram used: " + t/1024/1024); //MB
+        // Check how much ram is used
+//        long t = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+//        System.out.println("FEAAFacade.getAllReports ram used: " + t/1024/1024); //MB
 
         return new ArrayList<>(ReportDatabase.getTestReports());
     }
@@ -180,14 +181,11 @@ public class FEAAFacade {
         Order order = TestDatabase.getInstance().getOrder(token, orderID);
 
         order.finalise();
-        //uow.registerDirty(order); //unfinished
-        //uow.commit(); //unfinished
         TestDatabase.getInstance().saveOrder(token, order);
         return ContactHandler.sendInvoice(token, getClient(order.getClient()), contactPriorityAsMethods, order.generateInvoiceData());
     }
 
     public void logout() {
-        //uow.commit(); //unfinished
         AuthModule.logout(token);
         token = null;
     }
